@@ -19,7 +19,9 @@
               </ul>
 
               <div class="dropdown" *ngIf="(currentUser$ | async) as AppUser" dropdown>
-                  <a class="dropdown-toggle text-light" style="text-decoration: none;" dropdownToggle>Welcome {{AppUser.username| titlecase}}</a>
+                
+                  <img src="{{AppUser.photoUrl}}" alt="{{AppUser.username}}"/>
+                  <a class="dropdown-toggle text-light ml-2" style="text-decoration: none;" dropdownToggle>Welcome {{AppUser.username| titlecase}}</a>
                   <div class="dropdown-menu mt-3" *dropdownMenu>
                       <li class="dropdown-item" routerLink ="/member/edit">Edit Profile</li>
                       <div class="dropdown-divider"></div>

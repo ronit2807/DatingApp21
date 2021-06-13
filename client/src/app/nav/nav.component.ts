@@ -20,6 +20,7 @@ export class NavComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser$ = this.accountService.currentUser$;
+    
   }
 
   OnSubmit(form: NgForm){

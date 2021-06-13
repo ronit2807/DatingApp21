@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace API.Controllers
 
         public async Task<ActionResult<UserDTO>> login(LoginDTO loginDto)
         {
-            AppUser user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == loginDto.Username);
+            AppUser user = await _context.Users.Include(p=>p.Photos).SingleOrDefaultAsync(x => x.UserName == loginDto.Username);
 
             if (user == null) return Unauthorized("Invalid username");
             using var hmac = new HMACSHA512(user.PasswordSalt);
@@ -58,11 +59,14 @@ namespace API.Controllers
                 if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Wrong credentials.");
             }
 
-             return new UserDTO
+            var userDto = new UserDTO
             {
                 Username = user.UserName,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             };
+
+             return userDto;
 
         }
 
