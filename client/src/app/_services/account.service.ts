@@ -33,7 +33,12 @@ export class AccountService {
   register(model: any){
     return this.http.post('https://localhost:5001/api/account/register',{
       "username": model.username,
-      "password": model.password
+      "password": model.password,
+      "city":model.city,
+      "country":model.country,
+      "gender":model.gender,
+      "knownAs": model.knownAs,
+      "dateOfBirth": model.dateOfBirth
     }).pipe(
       map((userData: AppUser)=>{
         if(userData){
