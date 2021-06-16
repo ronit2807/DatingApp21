@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using API.Entities;
+using API.Helpers;
 using API.interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,9 +17,27 @@ namespace API.Data
             this.context = context;
         }
 
-        async Task<IEnumerable<AppUser>> IUserRepository.GetAllUsersAsync()
+       
+
+        async Task<PagedList<AppUser>> IUserRepository.GetAllUsersAsync(UserParams userParams)
         {
-            return await context.Users.Include(p=>p.Photos).ToListAsync();
+            var query = context.Users.Include(p=>p.Photos).AsQueryable();
+            query = query.Where(x=>x.UserName != userParams.CurrentUser);
+            query = query.Where(x=>x.Gender == userParams.Gender);
+            // query = query.Where(m=>m.GetAge() >= userParams.MinAge);
+            // query = query.Where(m=>m.GetAge() <= userParams.MaxAge);
+
+            var minDob = DateTime.Today.AddYears(-userParams.MaxAge -1);
+            var maxDob = DateTime.Today.AddYears(-userParams.MinAge);
+            query = query.Where(u=>u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+            if(userParams.OrderBy == "created"){
+                query = query.OrderByDescending(m=>m.Created);
+            }
+            else {
+                query = query.OrderByDescending(m=>m.LastActive);
+            }
+            return await PagedList<AppUser>.CreateAsync(query.AsNoTracking(),userParams.PageNumber,userParams.PageSize);
+
         }
 
         async Task<AppUser> IUserRepository.GetUserById(int id)
