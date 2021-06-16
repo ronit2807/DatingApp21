@@ -24,13 +24,18 @@ export class ErrorInterceptor implements HttpInterceptor {
               if(error.error.errors){
                 const modalErrorState=[];
                 for(const key in error.error.errors){
+                  if(error.error.errors[key]){
                   modalErrorState.push(error.error.errors[key]);
+                }
                 }
 
                 throw modalErrorState.flat();
-              }else {
-                this.toastr.error(error.statusText);
+              }else if(typeof(error.error) === 'object') {
+                this.toastr.error(error.statusText,error.status);
                 
+              }
+              else {
+                this.toastr.error(error.error,error.status)
               }
               break;
 
