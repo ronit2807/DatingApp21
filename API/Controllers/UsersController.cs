@@ -32,7 +32,6 @@ namespace API.Controllers
         }
 
         [HttpGet]
-
         public async Task<ActionResult<IEnumerable<MemberDTO>>> GetUser([FromQuery]UserParams userParams)
         {
             var username = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -57,6 +56,7 @@ namespace API.Controllers
         // }
 
         [HttpGet("{username}",Name ="GetUser")]
+        
         public async Task<ActionResult<MemberDTO>> GetUser(string username)
         {
             var user = mapper.Map<MemberDTO>(await userRepository.GetUserByUsername(username));

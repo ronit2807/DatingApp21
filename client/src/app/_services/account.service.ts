@@ -22,8 +22,7 @@ export class AccountService {
     }).pipe(
       map((userData: AppUser)=>{
         if(userData){
-          localStorage.setItem('AppUser',JSON.stringify(userData));
-          this.currentUserSource.next(userData);
+          this.setCurrentUser(userData);
         }
         
       })
@@ -42,8 +41,7 @@ export class AccountService {
     }).pipe(
       map((userData: AppUser)=>{
         if(userData){
-          localStorage.setItem('AppUser',JSON.stringify(userData));
-          this.currentUserSource.next(userData);
+          this.setCurrentUser(userData);
         }
         return userData;
         
@@ -52,6 +50,9 @@ export class AccountService {
   }
 
   setCurrentUser(user: AppUser){
+    user.roles=[];
+    const roles = this.decodeToken(user.token).role;
+    Array.isArray(roles)? user.roles = roles: user.roles.push(roles);
     localStorage.setItem('AppUser',JSON.stringify(user));
     this.currentUserSource.next(user);
   }
@@ -59,5 +60,10 @@ export class AccountService {
   logout(){
     localStorage.removeItem('AppUser');
     this.currentUserSource.next(null);
+  }
+
+  decodeToken(token){
+     return JSON.parse(atob(token.split('.')[1]));
+     
   }
 }
